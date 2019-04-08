@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Podcast Player</string>
+    <string name="button_submit">SUBMIT</string>
+    <string name="hint_comments">Make some comments!</string>
+    <string name="desc_pause">PAUSE</string>
+    <string name="desc_prev">PREVIOUS</string>
+    <string name="desc_play">PLAY</string>
+    <string name="desc_next">NEXT</string>
+    <string name="desc_stop">STOP</string>
+    <string name="desc_image">Album Cover</string>
+    <string name="menu_url">Add Podcasts</string>
+    <string name="menu_comments">View Comments</string>
+    <string name="text_default_time" translatable="false">0:00</string>
+    <string name="text_default_title">No Podcast</string>
+    <string name="bar_title_comm">All Comments</string>
+    <string name="toast_text_min_lenth">Enter at least 5 characters!</string>
+    <string name="toast_text_max_lenth">Enter at most 1000 characters!</string>
+    <string name="toast_comment_saved">Comment saved.</string>
+    <string name="toast_comment_failed">Comment failed.</string>
+    <string name="button_submit_land">OK</string>
+    <string name="bar_title_add_url">Add Podcast Source</string>
+    <string name="hint_url">Support HTTP(s) Protocol</string>
+    <string name="button_add">Add</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="menu_clearAll">Clear Comments</string>
+    <string name="toast_comment_cleared">Comments cleared.</string>
+    <string name="toast_invalid_url">Invalid Podcast Source!</string>
+    <string name="toast_copied">Copied to clipboard.</string>
+    <string name="menu_playlist">Playlist</string>
+    <string name="bar_title_playlist">Current Playlist</string>
+    <string name="text_empty_list">Nothing here.</string>
+    <string name="toast_last_play">Last podcast!</string>
+    <string name="toast_first_play">First podcast!</string>
+    <string name="toast_existence">Already in the playlist.</string>
+</resources>

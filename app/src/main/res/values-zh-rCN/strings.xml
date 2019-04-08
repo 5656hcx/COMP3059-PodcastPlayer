@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">播客播放器</string>
+    <string name="button_submit">提交</string>
+    <string name="hint_comments">写些评论吧！</string>
+    <string name="desc_pause">暂停</string>
+    <string name="desc_prev">上一首</string>
+    <string name="desc_play">播放</string>
+    <string name="desc_next">下一首</string>
+    <string name="desc_stop">停止</string>
+    <string name="desc_image">专辑封面</string>
+    <string name="menu_url">自定义播客流</string>
+    <string name="menu_comments">查看所有评论</string>
+    <string name="text_default_title">无播客</string>
+    <string name="bar_title_comm">所有评论</string>
+    <string name="toast_text_min_lenth">最少5个字。</string>
+    <string name="toast_text_max_lenth">最多1千字。</string>
+    <string name="toast_comment_saved">评论成功!</string>
+    <string name="toast_comment_failed">评论失败!</string>
+    <string name="button_submit_land">好</string>
+    <string name="bar_title_add_url">添加播客源链接</string>
+    <string name="button_add">添加</string>
+    <string name="button_cancel">取消</string>
+    <string name="hint_url">仅支持 HTTP/HTTPS协议</string>
+    <string name="menu_clearAll">清除所有评论</string>
+    <string name="toast_comment_cleared">清除成功!</string>
+    <string name="toast_invalid_url">无法添加此播客源!</string>
+    <string name="toast_copied">已复制到剪切板。</string>
+    <string name="menu_playlist">播放列表</string>
+    <string name="bar_title_playlist">当前播放列表</string>
+    <string name="text_empty_list">空空如也。</string>
+    <string name="toast_last_play">已是最后</string>
+    <string name="toast_first_play">已是最前</string>
+    <string name="toast_existence">已在播放列表中</string>
+</resources>

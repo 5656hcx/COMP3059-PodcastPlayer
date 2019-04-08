@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_playlist"
+        android:icon="@drawable/baseline_queue_music_24"
+        android:title="@string/menu_playlist"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_url"
+        android:title="@string/menu_url"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_comments"
+        android:title="@string/menu_comments"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_clearAll"
+        android:title="@string/menu_clearAll" />
+</menu>
