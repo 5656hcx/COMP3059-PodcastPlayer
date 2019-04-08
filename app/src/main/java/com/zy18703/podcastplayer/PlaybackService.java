@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class PlaybackService extends Service implements MediaPlayer.OnCompletionListener {
     // Background playback service
     // This service holds a playlist and a podcast player
-    // Will go through all podcasts in the playlist
+    // Will go through all podcasts automatically in the playlist
 
     public final static int NOTIFICATION_ID = 0;
     public final static String CHANNEL_ID = "Playback_0";
@@ -72,7 +72,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        // delete all existing notification when user eliminate the application process
+        // destroy the service when user eliminate the application process
         stopSelf();
     }
 
@@ -131,7 +131,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
             notificationManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID,
-                    CHANNERL_NAME, NotificationManager.IMPORTANCE_DEFAULT));
+                    CHANNERL_NAME, NotificationManager.IMPORTANCE_LOW));
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 

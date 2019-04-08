@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,17 +67,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // save current UI information
-        super.onSaveInstanceState(outState);
-        outState.putString("title", title.getText().toString());
-        outState.putString("played", time_played.getText().toString());
-        outState.putString("remain", time_remain.getText().toString());
-        outState.putInt("progress", seekBar.getProgress());
-        outState.putInt("duration", seekBar.getMax());
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // different layouts for portrait and landscape view
@@ -104,13 +92,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, PlaybackService.class);
             intent.putExtra("playlist", playList);
             startService(intent);
-        } else {
-            // restore saved UI information
-            title.setText(savedInstanceState.getString("title"));
-            time_played.setText(savedInstanceState.getString("played"));
-            time_remain.setText(savedInstanceState.getString("remain"));
-            seekBar.setMax(savedInstanceState.getInt("duration"));
-            seekBar.setProgress(savedInstanceState.getInt("progress"));
         }
     }
 
@@ -137,25 +118,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        if (binder != null) {
-            sync();
-            // tell handler to resume UI updating schedule
-            handler.sendEmptyMessage(MESSAGE_UPDATE);
-        }
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        // tell handler to pause UI updating schedule
-        handler.sendEmptyMessage(MESSAGE_PAUSE);
-        super.onPause();
-    }
-
-    @Override
     protected void onStop() {
         // unbind from playback service
+        handler.sendEmptyMessage(MESSAGE_PAUSE);
         unbindService(serviceConnection);
         super.onStop();
     }
@@ -221,18 +186,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             // tell handle to pause UI updating schedule and exit when connection lost
-            Log.e("addsad", "asddsa");
             handler.sendEmptyMessage(MESSAGE_PAUSE);
             binder = null;
             finish();
         }
     };
 
-    private String timeToText(int msec) {
+    private String timeToText(int progress, int duration) {
         // convert millisecond time to displayable text
-        int minute = msec/60000;
-        int second = Math.round((msec - minute * 60000)/1000f);
-        if (second < 10.0)
+        int minute_dura = (int) (duration / 60000f);
+        int second_dura = (int) (60 * (duration / 60000f - minute_dura));
+        int minute_prog = (int) (progress / 60000f);
+        int second_prog = (int) (60 * (progress / 60000f - minute_prog));
+
+        int second = second_dura - second_prog;
+        int minute = minute_dura - minute_prog;
+        if (second < 0) {
+            second = second + 60;
+            minute = minute - 1;
+        }
+
+        if (second < 10)
             return minute + ":0" + second;
         else
             return minute + ":" + second;
@@ -245,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
                 title.setText(binder.getTitle());
             else
                 title.setText(R.string.text_default_title);
-            seekBar.setMax(binder.getDuration());
             // change appearance of the play button
             switch (binder.getState()) {
                 case PLAYING:
@@ -259,9 +232,12 @@ public class MainActivity extends AppCompatActivity {
             }
             int progress = binder.getProgress();
             int duration = binder.getDuration();
-            time_played.setText(timeToText(progress));
-            time_remain.setText(timeToText(duration));
-            seekBar.setProgress(binder.getProgress());
+            if (progress > duration)
+                progress = duration;
+            time_played.setText(timeToText(0, progress));
+            time_remain.setText(timeToText(progress, duration));
+            seekBar.setMax(duration);
+            seekBar.setProgress(progress);
         }
     }
 
