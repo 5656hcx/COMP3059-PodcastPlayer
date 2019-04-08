@@ -1,5 +1,7 @@
 package com.zy18703.podcastplayer;
 
+import android.annotation.TargetApi;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -7,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -18,7 +21,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
     // Will go through all podcasts in the playlist
 
     public final static int NOTIFICATION_ID = 0;
-    public final static String CHANNEL_ID = "Playback";
+    public final static String CHANNEL_ID = "Playback_0";
+    public final static String CHANNERL_NAME = "Playback";
     private final PlayerBinder binder = new PlayerBinder();
     private final PodcastPlayer player = new PodcastPlayer();
     private ArrayList<String> playList;
@@ -53,6 +57,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         return binder;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onDestroy() {
         // delete all existing notification when service destroyed
@@ -60,6 +65,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
+            notificationManager.deleteNotificationChannel(CHANNEL_ID);
         super.onDestroy();
     }
 
@@ -105,6 +112,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         return false;
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void sendNotification(boolean onGoing) {
         // build and send a notification
         // when user click the notification system will start MainActivity using pending intent
@@ -121,6 +129,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
                                 PendingIntent.FLAG_UPDATE_CURRENT));
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
+            notificationManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID,
+                    CHANNERL_NAME, NotificationManager.IMPORTANCE_DEFAULT));
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
