@@ -2,8 +2,13 @@
 
 ## Version History
 
+### v1.1.9 (code 23)
+Improve performance of audio playback <br>
+Add new translation texts <br>
+Fix some errors <br>>
+
 ### v1.1.8.1 (code 22)
-Fix a problem when playback enters a new loop
+Fix a bug in notification <br>
 
 ### v1.1.8 (code 21)
 Improve UI layout <br>

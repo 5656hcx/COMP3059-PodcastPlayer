@@ -5,6 +5,8 @@ import android.net.Uri;
 
 import com.example.ryd.podcast.StreamingPlayer;
 
+import java.io.File;
+
 class PodcastPlayer extends StreamingPlayer {
     // Extended player of provided StreamingPlayer
 
@@ -18,7 +20,9 @@ class PodcastPlayer extends StreamingPlayer {
     String getTitle() {
         if (getFilePath() == null)
             return null;
-        return Uri.parse(getFilePath()).getLastPathSegment();
+        Uri uri = Uri.parse(getFilePath());
+        String title = uri.getQuery();
+        return title == null ? Uri.parse(getFilePath()).getLastPathSegment() : title;
     }
 
     int getDuration() {
@@ -37,6 +41,12 @@ class PodcastPlayer extends StreamingPlayer {
             try {
                 mediaPlayer.seekTo(progress);
             } catch (IllegalStateException e) { e.printStackTrace(); }
+        }
+    }
+
+    void setFilePath(String path) {
+        if (path != null && !path.isEmpty()) {
+            filePath = path;
         }
     }
 

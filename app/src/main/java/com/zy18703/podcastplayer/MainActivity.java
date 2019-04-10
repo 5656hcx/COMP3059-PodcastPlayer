@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         // different layouts for portrait and landscape view
         Configuration configuration = this.getResources().getConfiguration();
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             // reduce the times of call to startService()
             ArrayList<String> playList = new ArrayList<>();
             playList.add("https://upload.eeo.com.cn/2013/1022/1382412548839.mp3");
-            playList.add("https://upload.eeo.com.cn/2013/0827/1377568435342.mp3");
+            playList.add("https://upload.eeo.com.cn/2013/0606/1370481548195.mp3");
             Intent intent = new Intent(this, PlaybackService.class);
             intent.putExtra("playlist", playList);
             startService(intent);
@@ -153,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
-        sync();
     }
 
     @Override
@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 if (binder.getPlaylist() != null)
                     if (!binder.add(data.getDataString()))
                         Toast.makeText(this, R.string.toast_existence, Toast.LENGTH_SHORT).show();
-                sync();
             } else if (requestCode == REQUEST_PLAY) {
                 // receive request to play specific podcast
                 // add the request to message queue because connection may not be established
@@ -214,10 +213,11 @@ public class MainActivity extends AppCompatActivity {
     private void sync() {
         if (binder != null) {
             // retrieve everything from binder and update UI accordingly
-            if (binder.getTitle() != null)
-                title.setText(binder.getTitle());
+            String temp = binder.getTitle();
+            if (temp == null || temp.isEmpty())
+                title.setText(R.string.text_unknown_source);
             else
-                title.setText(R.string.text_default_title);
+                title.setText(temp);
             // change appearance of the play button
             switch (binder.getState()) {
                 case PLAYING:

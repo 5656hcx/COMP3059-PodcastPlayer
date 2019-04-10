@@ -33,4 +33,5 @@
     <string name="toast_first_play">First podcast!</string>
     <string name="toast_existence">Already in the playlist.</string>
     <string name="menu_exit">Exit</string>
+    <string name="text_unknown_source">Unknown Podcast</string>
 </resources>

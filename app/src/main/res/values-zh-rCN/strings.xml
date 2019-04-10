@@ -33,4 +33,5 @@
     <string name="toast_first_play">已是最前</string>
     <string name="toast_existence">已在播放列表中</string>
     <string name="menu_exit">退出</string>
+    <string name="text_unknown_source">未知播客</string>
 </resources>

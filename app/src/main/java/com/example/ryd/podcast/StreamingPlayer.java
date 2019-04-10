@@ -8,9 +8,9 @@ import java.io.IOException;
 
 public class StreamingPlayer {
 
+    protected String filePath;
     protected MediaPlayer mediaPlayer;
     private StreamingPlayerState state;
-    private String filePath;
 
     public enum StreamingPlayerState {
         ERROR,

@@ -34,7 +34,14 @@ public class PlaylistActivity extends AppCompatActivity {
             ArrayList<String> list = new ArrayList<>();
             int index = 1;
             for (String url: playlist) {
-                list.add(index + ". " + Uri.parse(url).getLastPathSegment());
+                Uri uri = Uri.parse(url);
+                String title = uri.getQuery();
+                if (title == null || title.isEmpty()) {
+                    title = uri.getLastPathSegment();
+                    if (title == null || title.isEmpty())
+                        title = getString(R.string.text_unknown_source);
+                }
+                list.add(index + ".\t" + title);
                 index++;
             }
             listView.setAdapter(new ArrayAdapter<>(this,

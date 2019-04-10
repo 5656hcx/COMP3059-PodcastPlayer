@@ -7,11 +7,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlaybackService extends Service implements MediaPlayer.OnCompletionListener {
@@ -45,13 +47,30 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        // Will be call when previous playback completes
-        if (currentSong + 1 == playList.size()) {
-            play(0);
-            player.pause();
-            stopForeground(false);
-        } else
-            playNext();
+        // Will be call when a mediaPlayer completes its stream
+        mp.reset();
+        try {
+            if (currentSong + 1 == playList.size()) {
+                // The last song completes, start a new loop
+                currentSong = 0;
+                mp.setDataSource(playList.get(currentSong));
+                mp.prepare();
+                mp.start();
+                player.pause();
+                player.setFilePath(playList.get(currentSong));
+                sendNotification(false);
+            } else {
+                // Continue to play the next song
+                mp.setDataSource(playList.get(++currentSong));
+                mp.prepare();
+                mp.start();
+                player.setFilePath(playList.get(currentSong));
+                sendNotification(true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            stopSelf();
+        }
     }
 
     @Override
@@ -127,7 +146,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         // when user click the notification system will start MainActivity using pending intent
         // onGoing flag specifies whether the service is playing and running in foreground
         String info = " (" + (currentSong + 1) + "/" + playList.size() + ")";
-        builder.setContentTitle(player.getTitle() + info);
+        Uri uri = Uri.parse(player.getFilePath());
+        String title = uri.getQuery();
+        if (title == null || title.isEmpty()) {
+            title = uri.getLastPathSegment();
+            if (title == null || title.isEmpty())
+                title = getString(R.string.text_unknown_source);
+        }
+        builder.setContentTitle(title + info);
         builder.setContentText(player.getFilePath());
         if (onGoing)
             startForeground(NOTIFICATION_ID, builder.build());
