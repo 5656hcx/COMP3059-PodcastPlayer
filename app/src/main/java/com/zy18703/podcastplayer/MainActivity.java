@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    // https://github.com/5656hcx/COMP3059-PodcastPlayer
     // MainActivity for user to write comment and control the playback
 
     private static final int MESSAGE_UPDATE = 0;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                          sync();
                     }
                     // update UI every 500ms
-                    sendEmptyMessageDelayed(MESSAGE_UPDATE, 500);
+                    sendEmptyMessageDelayed(MESSAGE_UPDATE, 250);
                     break;
                 case MESSAGE_PAUSE:
                     // pause UI updating schedule
@@ -85,20 +87,15 @@ public class MainActivity extends AppCompatActivity {
         button_play = findViewById(R.id.button_play);
 
         if (savedInstanceState == null) {
-            // first run, reduce the times of call to startService()
+            // reduce the times of call to startService()
             ArrayList<String> playList = new ArrayList<>();
             playList.add("https://upload.eeo.com.cn/2013/1022/1382412548839.mp3");
-            playList.add("https://upload.eeo.com.cn/2013/1016/1381893703264.mp3");
+            playList.add("https://upload.eeo.com.cn/2013/0827/1377568435342.mp3");
             Intent intent = new Intent(this, PlaybackService.class);
             intent.putExtra("playlist", playList);
             startService(intent);
         }
-    }
-
-    @Override
-    protected void onStart() {
-        // bind service and setup seekBar
-        bindService(new Intent(this, PlaybackService.class), serviceConnection, BIND_AUTO_CREATE);
+        bindService(new Intent(this, PlaybackService.class), serviceConnection, 0);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
@@ -114,20 +111,25 @@ public class MainActivity extends AppCompatActivity {
                 handler.sendEmptyMessage(MESSAGE_UPDATE);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        handler.sendEmptyMessage(MESSAGE_UPDATE);
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        // unbind from playback service
+        // tell the handler to pause UI updating
         handler.sendEmptyMessage(MESSAGE_PAUSE);
-        unbindService(serviceConnection);
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
-        // close the database, keep the playback service running
+        // unbind from service and close the database
+        unbindService(serviceConnection);
         database.close();
         super.onDestroy();
     }
@@ -149,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.button_stop:
                     binder.stop();
-                    stopService(new Intent(this, PlaybackService.class));
-                    finish();
                     break;
             }
         }
@@ -269,6 +269,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, PlaylistActivity.class);
                 intent.putStringArrayListExtra("playlist", binder.getPlaylist());
                 startActivityForResult(intent, REQUEST_PLAY);
+                break;
+            case R.id.menu_exit:
+                stopService(new Intent(this, PlaybackService.class));
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);

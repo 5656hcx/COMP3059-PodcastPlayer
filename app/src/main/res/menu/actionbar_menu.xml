@@ -17,5 +17,10 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_clearAll"
-        android:title="@string/menu_clearAll" />
+        android:title="@string/menu_clearAll"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_exit"
+        android:title="@string/menu_exit"
+        app:showAsAction="never" />
 </menu>

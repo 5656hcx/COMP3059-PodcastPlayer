@@ -72,6 +72,7 @@
             android:id="@+id/button_prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:contentDescription="@string/desc_prev"
             android:onClick="operation"
             app:srcCompat="@android:drawable/ic_media_rew" />
@@ -80,6 +81,7 @@
             android:id="@+id/button_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:contentDescription="@string/desc_play"
             android:onClick="operation"
             app:srcCompat="@android:drawable/ic_media_play" />
@@ -88,6 +90,7 @@
             android:id="@+id/button_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:contentDescription="@string/desc_next"
             android:onClick="operation"
             app:srcCompat="@android:drawable/ic_media_ff" />
@@ -96,6 +99,7 @@
             android:id="@+id/button_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:contentDescription="@string/desc_stop"
             android:onClick="operation"
             app:srcCompat="@android:drawable/ic_media_next" />

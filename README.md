@@ -1,6 +1,13 @@
 # COMP3059-PodcastPlayer
 
 ## Version History
+
+### v1.1.8 (code 21)
+Improve UI layout
+Improve notification
+Change playback service to loop the playlist
+Add exit menu which kills both process and service
+
 ### v1.1.6 (code 19)
 Fix unsynchronized playback time <br>
 Improve activity performance <br>

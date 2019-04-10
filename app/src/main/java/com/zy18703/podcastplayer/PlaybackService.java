@@ -1,6 +1,5 @@
 package com.zy18703.podcastplayer;
 
-import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,24 +19,43 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
     // This service holds a playlist and a podcast player
     // Will go through all podcasts automatically in the playlist
 
-    public final static int NOTIFICATION_ID = 0;
+    public final static int NOTIFICATION_ID = 1024;
     public final static String CHANNEL_ID = "Playback_0";
     public final static String CHANNERL_NAME = "Playback";
     private final PlayerBinder binder = new PlayerBinder();
     private final PodcastPlayer player = new PodcastPlayer();
     private ArrayList<String> playList;
     private static int currentSong = -1;
+    private NotificationCompat.Builder builder;
+    private NotificationManager notificationManager;
+
+    @Override
+    public void onCreate() {
+        builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.baseline_notify_podcast_24)
+                .setContentIntent(PendingIntent.getActivity(this, 0,
+                        new Intent(this, MainActivity.class),
+                        PendingIntent.FLAG_UPDATE_CURRENT));
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
+            notificationManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID,
+                    CHANNERL_NAME, NotificationManager.IMPORTANCE_LOW));
+        super.onCreate();
+    }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
         // Will be call when previous playback completes
-        playNext();
+        if (currentSong + 1 == playList.size()) {
+            play(0);
+            player.pause();
+        } else
+            playNext();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // will be call by every startService()
-
         if (playList == null) {
             // if playlist has not been initialized
             playList = intent.getStringArrayListExtra("playlist");
@@ -57,29 +75,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         return binder;
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
     public void onDestroy() {
-        // delete all existing notification when service destroyed
+        // delete all existing notification and release player resource
         player.stop();
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_ID);
+        notificationManager.cancelAll();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
             notificationManager.deleteNotificationChannel(CHANNEL_ID);
         super.onDestroy();
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        // destroy the service when user eliminate the application process
-        stopSelf();
-    }
-
     private boolean playNext() {
-        player.stop();
         if (playList != null && currentSong < playList.size()-1) {
             // if there is song in playlist to play
+            player.stop();
             player.load(playList.get(++currentSong), this);
             sendNotification(true);
             return true;
@@ -88,9 +97,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
     }
 
     private boolean playPrev() {
-        player.stop();
         if (currentSong > 0 && playList != null) {
             // if current song is not the first song
+            player.stop();
             player.load(playList.get(--currentSong), this);
             sendNotification(true);
             return true;
@@ -112,27 +121,27 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
     private void sendNotification(boolean onGoing) {
         // build and send a notification
         // when user click the notification system will start MainActivity using pending intent
-        // onGoing flag specifies whether the notification can be removed by user
+        // onGoing flag specifies whether the service is playing and running in foreground
         String info = " (" + (currentSong + 1) + "/" + playList.size() + ")";
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setSmallIcon(R.drawable.baseline_notify_podcast_24)
-                        .setContentTitle(player.getTitle() + info)
-                        .setContentText(player.getFilePath())
-                        .setOngoing(onGoing)
-                        .setContentIntent(PendingIntent.getActivity(this, 0,
-                                new Intent(this, MainActivity.class),
-                                PendingIntent.FLAG_UPDATE_CURRENT));
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1)
-            notificationManager.createNotificationChannel(new NotificationChannel(CHANNEL_ID,
-                    CHANNERL_NAME, NotificationManager.IMPORTANCE_LOW));
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        builder.setContentTitle(player.getTitle() + info);
+        builder.setContentText(player.getFilePath());
+        if (onGoing)
+            startForeground(NOTIFICATION_ID, builder.build());
+        else
+            notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    void play(int index) {
+        // play specific podcast in the playlist
+        if (index != -1 && index != currentSong) {
+            currentSong = index;
+            player.stop();
+            player.load(playList.get(currentSong), PlaybackService.this);
+            sendNotification(true);
+        }
     }
 
     class PlayerBinder extends Binder {
@@ -145,39 +154,37 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         boolean playPrev() { return PlaybackService.this.playPrev(); }
         boolean add(String source) { return PlaybackService.this.add(source); }
         ArrayList<String> getPlaylist() { return playList; }
-        void stop() { player.stop(); }
         void setProgress(int progress) { player.setProgress(progress); }
 
+        void stop() {
+            player.stop();
+            stopForeground(false);
+        }
+
+        void play(int index) { PlaybackService.this.play(index); }
         void play() {
             // resume playback or pause playback
             switch (player.getState()) {
                 case PLAYING:
                     player.pause();
+                    stopForeground(false);
                     sendNotification(false);
                     break;
                 case PAUSED:
                     player.play();
-                    sendNotification(true);
+                    startForeground(NOTIFICATION_ID, builder.build());
                     break;
                 case ERROR:
                 case STOPPED:
                     if (playList != null) {
                         player.load(playList.get(currentSong), PlaybackService.this);
-                        sendNotification(true);
+                        startForeground(NOTIFICATION_ID, builder.build());
                     }
                     break;
             }
         }
 
-        void play(int index) {
-            // play specific podcast in the playlist
-            if (index != -1 && index != currentSong) {
-                currentSong = index;
-                player.stop();
-                player.load(playList.get(currentSong), PlaybackService.this);
-                sendNotification(true);
-            }
-        }
+
     }
 
 }
