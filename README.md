@@ -3,10 +3,10 @@
 ## Version History
 
 ### v1.1.8 (code 21)
-Improve UI layout
-Improve notification
-Change playback service to loop the playlist
-Add exit menu which kills both process and service
+Improve UI layout <br>
+Improve notification mechanism <br>
+Change playback service to loop the playlist <br>
+Add exit menu which kills both process and service <br>
 
 ### v1.1.6 (code 19)
 Fix unsynchronized playback time <br>
@@ -19,4 +19,5 @@ Add support to Android Oreo (Api 26+) <br>
 First release version (minSDK = 24) <br>
 
 ## Screenshots
-![avatar](http://sowcar.com/t6/697/1554730607x661254834.png)
+![avatar](http://sowcar.com/t6/698/1554869232x2372228201.png)
+![avatar](http://sowcar.com/t6/698/1554869266x2372228356.png)
