@@ -2,6 +2,9 @@
 
 ## Version History
 
+### v1.1.8.1 (code 22)
+Fix a problem when playback enters a new loop
+
 ### v1.1.8 (code 21)
 Improve UI layout <br>
 Improve notification mechanism <br>

@@ -49,6 +49,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnCompletion
         if (currentSong + 1 == playList.size()) {
             play(0);
             player.pause();
+            stopForeground(false);
         } else
             playNext();
     }
